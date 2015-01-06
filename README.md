@@ -1,4 +1,4 @@
 agent
 =====
 
-Agent that allows integration with DependencyWatcher service from local machine
+Agent allows integration with DependencyWatcher service from local machine
