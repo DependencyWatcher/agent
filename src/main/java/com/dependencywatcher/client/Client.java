@@ -8,13 +8,17 @@ import java.util.Arrays;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 
 /**
  * DependencyWatcher client
@@ -23,6 +27,10 @@ public class Client {
 
 	private static final String BASE_URI = "https://dependencywatcher.com/api/v1/";
 	private CloseableHttpClient httpClient;
+
+	static {
+		System.setProperty("jsse.enableSNIExtension", "false");
+	}
 
 	public Client(String apiKey) {
 		httpClient = HttpClientBuilder
@@ -68,10 +76,18 @@ public class Client {
 		putMethod.setEntity(httpEntity);
 
 		try {
-			httpClient.execute(putMethod).close();
-
+			CloseableHttpResponse result = httpClient.execute(putMethod);
+			try {
+				StatusLine status = result.getStatusLine();
+				if (status.getStatusCode() != HttpStatus.SC_CREATED) {
+					throw new APICallException(EntityUtils.toString(result
+							.getEntity()), status.getStatusCode());
+				}
+			} finally {
+				result.close();
+			}
 		} catch (HttpResponseException e) {
-			throw new APICallException(e.getMessage());
+			throw new APICallException(e.getMessage(), e.getStatusCode());
 
 		} catch (IOException e) {
 			throw new NotAvailableException(e);
@@ -107,8 +123,8 @@ public class Client {
 	public static class APICallException extends ClientException {
 		private static final long serialVersionUID = 1L;
 
-		public APICallException(String message) {
-			super(message);
+		public APICallException(String message, int status) {
+			super("HTTP " + status + " " + message);
 		}
 	}
 }
