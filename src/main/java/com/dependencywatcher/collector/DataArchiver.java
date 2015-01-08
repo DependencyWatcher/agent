@@ -13,16 +13,23 @@ import net.lingala.zip4j.util.Zip4jConstants;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Collects various information into temporary directory.
+ * Collects files into temporary directory, then archives it.
  */
-public class DataCollector {
+public class DataArchiver {
 
 	private Path projectRoot;
 	private Path tempDir;
 
-	public DataCollector(Path projectRoot) throws IOException {
+	public DataArchiver(Path projectRoot) throws IOException {
 		this.projectRoot = projectRoot;
 		this.tempDir = Files.createTempDirectory("dw-collector");
+	}
+
+	public void dispose() throws IOException {
+		if (tempDir != null) {
+			FileUtils.deleteDirectory(tempDir.toFile());
+			tempDir = null;
+		}
 	}
 
 	/**
@@ -71,7 +78,7 @@ public class DataCollector {
 			zipFile.addFolder(tempDir.toFile(), parameters);
 
 		} finally {
-			FileUtils.deleteDirectory(tempDir.toFile());
+			dispose();
 		}
 		return tmpFile;
 	}

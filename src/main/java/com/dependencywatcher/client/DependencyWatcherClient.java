@@ -23,7 +23,7 @@ import org.apache.http.util.EntityUtils;
 /**
  * DependencyWatcher client
  */
-public class Client {
+public class DependencyWatcherClient {
 
 	private static final String BASE_URI = "https://dependencywatcher.com/api/v1/";
 	private CloseableHttpClient httpClient;
@@ -32,7 +32,7 @@ public class Client {
 		System.setProperty("jsse.enableSNIExtension", "false");
 	}
 
-	public Client(String apiKey) {
+	public DependencyWatcherClient(String apiKey) {
 		httpClient = HttpClientBuilder
 				.create()
 				.setDefaultHeaders(

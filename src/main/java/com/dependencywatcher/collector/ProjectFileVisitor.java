@@ -1,20 +1,16 @@
 package com.dependencywatcher.collector;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 
-import net.lingala.zip4j.exception.ZipException;
-
 /**
- * Goes over all project files, and collects needed information
+ * Visits project files, and collects interesting information
  */
-public class ProjectExplorer extends SimpleFileVisitor<Path> {
+public class ProjectFileVisitor extends SimpleFileVisitor<Path> {
 
 	private static final String[] files = new String[] { "pom.xml",
 			"project.clj", "Gemfile", "build.gradle", "package.json",
@@ -25,14 +21,14 @@ public class ProjectExplorer extends SimpleFileVisitor<Path> {
 			Pattern.compile(".*\\.php[345s]?"), Pattern.compile(".*\\.phtml"),
 			Pattern.compile(".*\\.jsp"), };
 
-	private Path projectRoot;
-	private DataCollector dataCollector;
+	private DataArchiver dataArchiver;
 	private StringBuilder fileList;
+	private Path projectRoot;
 
-	public ProjectExplorer(Path projectRoot) throws IOException {
-		this.projectRoot = projectRoot;
-		this.dataCollector = new DataCollector(projectRoot);
+	public ProjectFileVisitor(DataArchiver dataArchiver, Path projectRoot) {
+		this.dataArchiver = dataArchiver;
 		this.fileList = new StringBuilder();
+		this.projectRoot = projectRoot;
 	}
 
 	@Override
@@ -67,7 +63,7 @@ public class ProjectExplorer extends SimpleFileVisitor<Path> {
 			}
 		}
 		if (collect) {
-			dataCollector.collect(file);
+			dataArchiver.collect(file);
 		}
 
 		fileList.append(projectRoot.relativize(file)).append('\n');
@@ -76,17 +72,9 @@ public class ProjectExplorer extends SimpleFileVisitor<Path> {
 	}
 
 	/**
-	 * Iterates on all files in the project, and return archive containing
-	 * collected data
-	 * 
-	 * @return archive containing the collected data
-	 * @throws IOException
-	 * @throws ZipException
+	 * @return list of all files in a project
 	 */
-	public File explore() throws IOException, ZipException {
-		Files.walkFileTree(projectRoot, this);
-
-		dataCollector.add("DWFileList.txt", fileList.toString());
-		return dataCollector.createArchive();
+	public String getFileList() {
+		return fileList.toString();
 	}
 }

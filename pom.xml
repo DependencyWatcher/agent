@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.dependencywatcher</groupId>
 	<artifactId>agent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>DependencyWatcher Agent</name>
 	<description>Agent allows integration with DependencyWatcher service from local machine</description>
 
