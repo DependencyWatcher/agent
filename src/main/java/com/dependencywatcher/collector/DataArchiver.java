@@ -48,10 +48,8 @@ public class DataArchiver {
 	/**
 	 * Create new file in the data archive
 	 * 
-	 * @param String
-	 *            file File name
-	 * @param String
-	 *            contents File contents
+	 * @param file File name
+	 * @param contents File contents
 	 * 
 	 * @throws IOException
 	 */
