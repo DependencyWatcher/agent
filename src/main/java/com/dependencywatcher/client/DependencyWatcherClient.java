@@ -25,14 +25,26 @@ import org.apache.http.util.EntityUtils;
  */
 public class DependencyWatcherClient {
 
-	private static final String BASE_URI = "https://dependencywatcher.com/api/v1/";
 	private CloseableHttpClient httpClient;
+	private String baseUri;
 
 	static {
 		System.setProperty("jsse.enableSNIExtension", "false");
 	}
 
 	public DependencyWatcherClient(String apiKey) {
+		this(null, apiKey);
+	}
+
+	public DependencyWatcherClient(String baseUri, String apiKey) {
+		if (baseUri != null) {
+			while (baseUri.endsWith("/")) {
+				baseUri = baseUri.substring(0, baseUri.length() - 1);
+			}
+		}
+		this.baseUri = baseUri == null ? "https://dependencywatcher.com/api/v1"
+				: baseUri;
+
 		httpClient = HttpClientBuilder
 				.create()
 				.setDefaultHeaders(
@@ -64,7 +76,7 @@ public class DependencyWatcherClient {
 	public void uploadRepository(String name, File archive)
 			throws ClientException {
 
-		HttpPut putMethod = new HttpPut(BASE_URI + "repository/"
+		HttpPut putMethod = new HttpPut(baseUri + "/repository/"
 				+ encodeURIComponent(name));
 
 		HttpEntity httpEntity = MultipartEntityBuilder
@@ -126,5 +138,12 @@ public class DependencyWatcherClient {
 		public APICallException(String message, int status) {
 			super("HTTP " + status + " " + message);
 		}
+	}
+
+	public static void main(String[] args) throws ClientException {
+		DependencyWatcherClient client = new DependencyWatcherClient(
+				"http://localhost:3001/api/v1/",
+				"235a3eef-8419-48e1-aed8-92b4062ea6e9");
+		client.uploadRepository("TLDRify", new File("/tmp/tldrify.com.zip"));
 	}
 }
