@@ -101,6 +101,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>1.5</version>
+				<configuration>
+					<defautKeyring>false</defautKeyring>
+					<keyname>B13E5340</keyname>
+					<publicKeyring>.keys/pubring.gpg</publicKeyring>
+					<secretKeyring>.keys/secring.gpg</secretKeyring>
+				</configuration>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
